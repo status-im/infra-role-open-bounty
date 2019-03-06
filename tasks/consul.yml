@@ -1,0 +1,15 @@
+---
+- name: Create Consul service definition
+  include_role: name=consul-service
+  vars:
+    consul_config_name: '{{ cont_name }}'
+    consul_services:
+      - name: '{{ cont_name }}'
+        tags: ['logging']
+        # we advertise the port with basic auth
+        port: '{{ cont_port }}'
+        checks:
+          - id: openbounty-status
+            name: Kibana Healthcheck
+            type: http
+            http: 'http://localhost:{{ cont_port }}/api/top-hunters'

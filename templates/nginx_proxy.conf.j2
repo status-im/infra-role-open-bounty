@@ -1,0 +1,18 @@
+server {
+  listen 80;
+  server_name {{ sob_domain }};
+  return 301 https://$server_name$request_uri;
+}
+
+server {
+  listen 443 ssl;
+
+  server_name {{ sob_domain }};
+
+  ssl_certificate     /certs/origin.crt;
+  ssl_certificate_key /certs/origin.key;
+
+  location / {
+    proxy_pass http://127.0.0.1:{{ cont_port }}/;
+  }
+}

@@ -1,0 +1,26 @@
+---
+- name: Enable OpenBounty HTTP & HTTPS ports
+  iptables:
+    comment: OpenBounty
+    chain: INPUT
+    jump: ACCEPT
+    source: '0.0.0.0/0'
+    protocol: 'tcp'
+    destination_port: '{{ item }}'
+  with_items:
+    - 80
+    - 443
+  notify:
+    - Save iptables rules
+
+- name: Enable Postgres Admin UI ports
+  iptables:
+    comment: Postgres ADM
+    action: insert
+    chain: DOCKER-USER
+    jump: ACCEPT
+    source: '0.0.0.0/0'
+    protocol: 'tcp'
+    destination_port: 8080
+  notify:
+    - Save iptables rules

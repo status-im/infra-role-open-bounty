@@ -1,0 +1,54 @@
+---
+- name: Create directory for DB data
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ db_host_uid }}'
+    group: docker
+    recurse: true
+  with_items:
+    - '{{ db_cont_vol }}/data'
+    - '{{ db_cont_vol }}/backups'
+
+- name: Start PostgreSQL container
+  docker_container:
+    name: '{{ db_cont_name }}'
+    image: '{{ db_cont_image }}'
+    pull: true
+    restart_policy: always
+    state: '{{ cont_state }}'
+    recreate: '{{ cont_recreate }}'
+    restart: '{{ cont_restart }}'
+    env:
+      POSTGRES_DB:       '{{ sob_db_name }}'
+      POSTGRES_USER:     '{{ sob_db_user }}'
+      POSTGRES_PASSWORD: '{{ sob_db_pass }}'
+    ports:
+      - '0.0.0.0:{{ db_cont_port }}:{{ db_cont_port }}'
+    volumes:
+      - '{{ db_cont_vol }}/data:/var/lib/postgresql'
+      - '{{ db_cont_vol }}/backups:/var/tmp/backups'
+
+- name: Start PostgreSQL Adminer container
+  docker_container:
+    name: '{{ dba_cont_name }}'
+    image: '{{ dba_cont_image }}'
+    pull: true
+    restart_policy: always
+    state: '{{ cont_state }}'
+    recreate: '{{ cont_recreate }}'
+    restart: '{{ cont_restart }}'
+    ports:
+      - '0.0.0.0:{{ dba_cont_port }}:{{ dba_cont_port }}'
+    links:
+      - '{{ db_cont_name }}:db'
+
+- name: Copy over Dummy DB SQL
+  copy:
+    src: openbounty_test_data.sql
+    dest: '/var/tmp/'
+  when: sob_testing
+
+- name: Import dummy data into PostgreSQL
+  shell: cat /var/tmp/openbounty_test_data.sql | docker exec -i {{ db_cont_name }} psql -U {{ sob_db_user }}
+  when: sob_testing

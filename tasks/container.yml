@@ -1,0 +1,48 @@
+---
+- name: Create directory for config files
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: dockremap
+    group: docker
+    recurse: true
+  with_items:
+    - '{{ cont_vol }}/conf'
+    - '{{ cont_vol }}/wallet'
+
+- name: Generate OpenBounty configuration
+  template:
+    src: config.edn.j2
+    dest: '{{ cont_vol }}/conf/config.edn'
+    owner: dockremap
+    group: docker
+    mode: 0640
+  register: config
+
+- name: Create container for OpenBounty
+  docker_container:
+    name: '{{ cont_name }}'
+    image: '{{ cont_image }}'
+    pull: true
+    restart_policy: always
+    state: '{{ cont_state }}'
+    recreate: '{{ cont_recreate }}'
+    restart: '{{ config.changed | default(cont_restart) }}'
+    entrypoint: '/usr/bin/java'
+    # enable automatic container updates
+    labels:
+      com.centurylinklabs.watchtower.enable: 'true' 
+    command: |
+      -Duser.timezone=UTC
+      -Dconf=/root/config.edn
+      -jar /root/commiteth.jar
+    links:
+      - '{{ db_cont_name }}:database'
+    ports:
+      - '{{ cont_port }}:{{ cont_port }}'
+    env:
+      server_address: 'https://{{ sob_domain }}'
+      jdbc-database-url: '{{ sob_jdbc_url }}'
+    volumes:
+      - '{{ cont_vol }}/conf/config.edn:/root/config.edn'
+      - '{{ cont_vol }}/wallet/default:/root/ethereum-wallet'

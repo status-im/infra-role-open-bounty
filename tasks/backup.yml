@@ -1,0 +1,43 @@
+---
+- name: Create directory for backup script
+  file:
+    path: '{{ item }}'
+    state: directory
+    group: adm
+    mode: 0775
+  with_items:
+    - '{{ sob_backup_script_dir }}'
+    - '{{ db_backup_dir }}'
+
+- name: Create PostgreSQL dump script
+  copy:
+    dest: '{{ sob_backup_script }}'
+    content: |
+      #!/usr/bin/env bash
+      TSTAMP=$(date -u +%Y%m%d%H%M%S)
+      /usr/bin/docker exec -i {{ db_cont_name }} \
+          pg_dump -U {{ sob_db_user }} {{ sob_db_name }} \
+          > {{ db_backup_dir }}/{{ cont_name }}_dump_${TSTAMP}.sql
+    group: adm
+    mode: 0750
+
+- name: Configure PostgreSQL dump cron kob
+  cron:
+    name: PostgreSQL DB Dump
+    minute: 0
+    hour: 4
+    user: root
+    job: '{{ sob_backup_script }}'
+
+- name: Configure Discourse backups
+  include_role:
+    name: s3cmd-backup
+  vars:
+    backup_name: sob
+    backup_hour: 5
+    backup_directory: '/var/tmp/backups/sob'
+    backup_base_domain: ams3.digitaloceanspaces.com
+    backup_bucket_name: 's3://sob-backups'
+    backup_encryption_pass: '{{lookup("passwordstore", "services/openbounty/backup-pass")}}'
+    backup_access_key: '{{lookup("passwordstore", "cloud/DigitalOcean/spaces/sob-backups.key")}}'
+    backup_secret_key: '{{lookup("passwordstore", "cloud/DigitalOcean/spaces/sob-backups.secret")}}'

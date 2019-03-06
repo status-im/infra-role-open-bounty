@@ -1,0 +1,30 @@
+---
+sob_domain: 'test-openbounty.status.im'
+# for multiple stages
+sob_branch: 'deploy-test'
+# if anable dummy data will be loaded into the database
+sob_testing: false
+
+cont_image: 'statusteam/openbounty-app:{{ sob_branch }}'
+cont_name: 'openbounty'
+cont_vol: '/docker/{{ cont_name }}'
+cont_port: 3000
+
+cont_state: started
+cont_recreate: false
+cont_restart: false
+
+# PostgreSQL database for SOB
+db_cont_image: 'postgres:9.6-alpine'
+db_cont_name: '{{ cont_name }}-db'
+db_cont_port: 5432
+db_cont_uid: 70
+db_host_uid: '{{ 100000 + db_cont_uid - 1 }}'
+db_cont_vol: '/docker/{{ db_cont_name }}'
+db_backup_dir: '/var/tmp/backups/sob'
+sob_backup_script_dir: '/var/lib/backups'
+sob_backup_script: '{{ sob_backup_script_dir }}/sob_db_backup.sh'
+
+dba_cont_image: 'adminer:4.6.3-standalone'
+dba_cont_name: '{{ cont_name }}-db-admin'
+dba_cont_port: 8080

@@ -12,4 +12,4 @@ Currently only two installations exist:
 
 # Configuration
 
-Configured via `host_vars`, for example configuration see [`ansible/group_vars/sob-test.yml`](/ansible/group_vars/sob-test.yml).
+Normally configured via `host_vars`. You `prod` and `test` environments were configured in [`vars`](/vars) directory.

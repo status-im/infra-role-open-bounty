@@ -1,0 +1,77 @@
+---
+sob_branch: 'deploy-test'
+sob_db_name: 'commiteth'
+sob_db_user: '{{lookup("passwordstore", "services/openbounty/test/db-user")}}'
+sob_db_pass: '{{lookup("passwordstore", "services/openbounty/test/db-pass")}}'
+# if anable dummy data will be loaded into the database
+sob_testing: true
+sob_domain: 'test-openbounty.status.im'
+
+# necessary to connect to the database
+sob_jdbc_url: 'jdbc:postgresql://database:{{ db_cont_port }}/{{ sob_db_name }}?user={{ sob_db_user }}&password={{ sob_db_pass }}'
+
+sob_settings:
+  # Secrets
+  github-user:           '{{lookup("passwordstore", "services/openbounty/github-user")}}'
+  github-password:       '{{lookup("passwordstore", "services/openbounty/github-pass")}}'
+  github-client-id:      '{{lookup("passwordstore", "services/openbounty/test/github-client-id")}}'
+  github-client-secret:  '{{lookup("passwordstore", "services/openbounty/test/github-client-secret")}}'
+  eth-account:           '{{lookup("passwordstore", "services/openbounty/test/eth-account")}}'
+  eth-password:          '{{lookup("passwordstore", "services/openbounty/test/eth-password")}}'
+  hubspot-api-key:       '{{lookup("passwordstore", "services/openbounty/test/hubspot-api-key")}}'
+  webhook-secret:        '{{lookup("passwordstore", "services/openbounty/test/webhook-secret")}}'
+  # paths
+  eth-wallet-file:       '/root/ethereum-wallet'
+  html2png-command:      '/root/html2png.sh'
+  # ethereum
+  on-testnet:            true
+  gas-price:             22000000000
+  contract-factory-addr: '0x3B9A3c062Bdb640b5039C0cCda4157737d732F95'
+  tokenreg-addr:         '0x7D127A3e3b5E72Cd8f15e7DEe650aBe4FCceD2B9'
+  eth-rpc-url:           'https://ropsten.infura.io/OUwJWCjDjR7Doe0qZHBQ'
+  # general
+  port:                  3000
+  nrepl-port:            7001
+  session-timeout:       180
+  server-address:        'https://{{ sob_domain }}'
+  # database
+  jdbc-database-url:     '{{ sob_jdbc_url }}'
+
+sob_testnet_token_data: []
+
+sob_token_blacklist:
+  - GNT
+
+sob_users_whitelist:
+  - ""
+  - Chu127001
+  - ChuQATestOrganization-123
+  - ChuQaTestMailRu
+  - ChuUser
+  - OrganizationChuStatus
+  - TestingEnvENV
+  - TestingEnvOrg
+  - andytudhope
+  - anna02test
+  - anna03test
+  - anna04test
+  - anna05test
+  - anna06test
+  - anna07test
+  - anna08test
+  - anna09test
+  - ara4n
+  - arash009
+  - cancuncoconut
+  - cancuncoconut2
+  - carlbennetts
+  - commitethtest
+  - izqui
+  - jarradh
+  - lampholder
+  - noman-land
+  - obt1
+  - oskarth
+  - pablanopete
+  - siphiuel
+  - tpatja

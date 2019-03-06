@@ -1,3 +1,7 @@
+# __WARNING__
+
+>:warning: __This repository is an archive of how Status Open Bounty used to be configured.__
+
 # Description
 
 This role configures Status [Open Bounty](https://github.com/status-im/open-bounty) service which sets bounties for GitHub issues and pais out Eth rewards.
